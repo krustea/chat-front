@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import './App.css';
 import FormMessage from "./components/FormMessage";
 import ListMessages from "./components/ListMessages";
+import io from 'socket.io-client';
+
+const socket = io('http://localhost:4001');
 
 class App extends Component {
     constructor(props){
@@ -12,15 +15,16 @@ class App extends Component {
     componentDidMount() {
         fetch('http://localhost:4000/messages')
             .then(reponse =>reponse.json())
-            .then(data=>this.setState({messages: data}))
+            .then(data=>this.setState({messages: data}));
+        socket.on('New message', message=> this.setState({messages: [message, ...this.state.messages]}))
     }
 
     render() {
     return (
       <div className="App">
         <header className="App-header">
-          <FormMessage/>
-            <ListMessages messages={{this.state.messages}}/>
+          <FormMessage socket={socket}/>
+            <ListMessages messages={this.state.messages}/>
         </header>
       </div>
     );
